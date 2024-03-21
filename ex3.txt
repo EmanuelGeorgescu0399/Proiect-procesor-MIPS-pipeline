@@ -1,0 +1,83 @@
+def citeste_date(cinema_file):
+    # Inițializăm un dicționar gol pentru a stoca datele citite
+    program = {}
+
+    # Deschidem fișierul specificat pentru citire ('r')
+    with open(cinema_file, 'r') as file:
+        # Iterăm prin fiecare linie din fișier
+        for line in file:
+            # Eliminăm spațiile albe de la început și de la sfârșitul liniei și separăm linia în componente
+            line = line.strip()
+            detalii = line.split(" % ")
+
+            # Obținem numele cinematografului, numele filmului și orele de difuzare
+            cinema, film, ore = detalii
+            #cinema=detalii[0]
+            #film=detalii[1]
+            #ore=detalii[2]
+
+            # Verificăm dacă cinematograful există deja în dicționar
+            if cinema not in program:
+                # Dacă nu există, adăugăm cheia cinematografului cu o listă goală asociată
+                program[cinema] = []
+
+            # Adăugăm în lista de programe a cinematografului un tuplu cu numele filmului și orele de difuzare
+            program[cinema].append((film, ore.split()))
+
+    # Returnăm dicționarul care conține informațiile organizate pe baza cinematografelor
+    return program
+
+# Apelul funcției citeste_date cu fișierul 'cinema.in' și afișarea rezultatului
+program = citeste_date('cinema.txt')
+print(program)
+
+
+def sterge_film(program, cinema, film):
+    # Verificăm dacă cinematograful și filmul există în program
+    if cinema in program and any(f == film for f, _ in program[cinema]):
+        # Inițializăm o listă goală pentru a stoca filmele actualizate
+        filme_actualizate = []
+
+        # Iterăm prin filmele din cinematograf
+        for nume_film, ore in program[cinema]:
+            # Dacă numele filmului nu este cel pe care dorim să-l ștergem, îl adăugăm în lista actualizată
+            if nume_film != film:
+                filme_actualizate.append((nume_film, ore))
+        
+        # Actualizăm programul cinematografic cu lista actualizată de filme
+        program[cinema] = filme_actualizate
+    
+    # Returnăm programul cinematografic actualizat
+    return program
+
+# Solicităm utilizatorului numele filmului de șters și numele cinematografului
+film_de_sters = input("Introduceți numele filmului de șters: ")
+cinema_film = input("Introduceți numele cinematografului: ")
+
+# Apelăm funcția sterge_film cu informațiile introduse și afișăm rezultatul actualizat
+program = sterge_film(program, cinema_film, film_de_sters)
+print("Programul actualizat al cinematografelor este:", program)
+
+
+
+from operator import itemgetter
+
+def cinema_film(program, cinematografe):
+    filme_cinema = []
+    for cinema in cinematografe:
+        if cinema in program:
+            for film, ore in program[cinema]:
+                filme_cinema.append((film, cinema, len(ore)))
+    
+    # Sortăm lista 'filme_cinema' după numele filmului și apoi după numărul de ore (descrescător)
+    filme_cinema.sort(key=itemgetter(0))
+    filme_cinema.sort(key=itemgetter(2), reverse=True)
+
+    return filme_cinema
+
+cinema_1 = input("Numele primului cinematograf: ")
+cinema_2 = input("Numele celui de-al doilea cinematograf: ")
+lista_filme = cinema_film(program, [cinema_1, cinema_2])
+
+for film, cinema, ore in lista_filme:
+    print(f"Filmul '{film}' rulează la '{cinema}' de {ore} ori")
